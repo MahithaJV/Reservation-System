@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import User
+from fastapi import FastAPI
+from .routers import users, tables, booking
+from . import models
+from .database import engine
 
-app = FastAPI(title="Reservation System")
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+
+app.include_router(users.router)
+app.include_router(tables.router)
+app.include_router(booking.router)
 
 @app.get("/")
-def root(db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    return {"users_count": len(users)}
+def home():
+    return {"message": "Reservation API working!"}
